@@ -1,7 +1,5 @@
 package guru.springframework.sfgpetclinic.model;
 
-import javax.persistence.Entity;
-
 public class Person {
 
     private String firstName;
