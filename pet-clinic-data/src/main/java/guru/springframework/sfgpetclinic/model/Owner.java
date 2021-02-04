@@ -18,7 +18,9 @@ public class Owner extends Person {
         this.address = address;
         this.telephone = telephone;
         this.city = city;
-        this.pets = pets;
+
+        if (pets != null)
+            this.pets = pets;
     }
 
     @Column(name = "address")
