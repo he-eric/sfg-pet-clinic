@@ -50,6 +50,7 @@ public class PetController {
     @GetMapping("/pets/new")
     public String processNewPet(Owner owner, Model model) {
         Pet pet = Pet.builder().build();
+        pet.setOwner(owner);
         owner.getPets().add(pet);
         model.addAttribute("pet", pet);
         return CREATE_OR_UPDATE_PET_VIEW;
