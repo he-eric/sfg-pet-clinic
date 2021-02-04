@@ -8,9 +8,12 @@ import guru.springframework.sfgpetclinic.services.PetService;
 import guru.springframework.sfgpetclinic.services.PetTypeService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Collection;
 
 @Controller
@@ -56,5 +59,35 @@ public class PetController {
     public String processEditPet(@PathVariable Long petId, Model model) {
         model.addAttribute("pet", petService.findById(petId));
         return CREATE_OR_UPDATE_PET_VIEW;
+    }
+
+    @PostMapping("/pets/new")
+    public String processCreation(Owner owner, @Valid Pet pet, BindingResult result, Model model) {
+        if (StringUtils.hasLength(pet.getName()) && pet.isNew() && owner.getPet(pet.getName(), true) != null) {
+            result.rejectValue("name", "duplicate", "already exists");
+        }
+
+        owner.getPets().add(pet);
+        if (result.hasErrors()) {
+            model.addAttribute("pet", pet);
+            return CREATE_OR_UPDATE_PET_VIEW;
+        } else {
+            petService.save(pet);
+            return "redirect:/owners/" + owner.getId();
+        }
+    }
+
+    @PostMapping("/pets/{petId}/edit")
+    public String processUpdate(Owner owner, @Valid Pet pet, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            pet.setOwner(owner);
+            model.addAttribute("pet", pet);
+            return CREATE_OR_UPDATE_PET_VIEW;
+        }
+        else {
+            owner.getPets().add(pet);
+            petService.save(pet);
+            return "redirect:/owners/" + owner.getId();
+        }
     }
 }

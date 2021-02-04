@@ -83,4 +83,30 @@ class PetControllerTest {
                 .andExpect(model().attributeExists("owner"))
                 .andExpect(view().name(CREATE_OR_UPDATE_PET_VIEW));
     }
+
+    @Test
+    void processCreate() throws Exception {
+        when(ownerService.findById(anyLong())).thenReturn(owner);
+        when(petTypeService.findAll()).thenReturn(petTypes);
+
+        mockMvc.perform(post("/owners/1/pets/new"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(model().attributeExists("pet"))
+                .andExpect(view().name("redirect:/owners/1"));
+
+        verify(petService).save(any());
+    }
+
+    @Test
+    void processUpdate() throws Exception {
+        when(ownerService.findById(anyLong())).thenReturn(owner);
+        when(petTypeService.findAll()).thenReturn(petTypes);
+
+        mockMvc.perform(post("/owners/1/pets/1/edit"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(model().attributeExists("pet"))
+                .andExpect(view().name("redirect:/owners/1"));
+
+        verify(petService).save(any());
+    }
 }
